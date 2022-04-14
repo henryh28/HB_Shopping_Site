@@ -15,9 +15,39 @@
                 <div class="card-body">
                     <h5 class="card-title">Price per melon</h5>
                     <div class="card-text">{{ display_melon.price_str() }}</div>
-                    <a class="btn btn-primary" href="/add_to_cart/{{ display_melon.melon_id }}">Add to cart</a>
-                </div>
+
+                    <form action="/add_to_cart/{{ display_melon.melon_id }}" method="POST">
+                        <button onclick="decrement()">-</button>
+                        <input id="quantity-select" name="quantity" type="number" min="1" max="100" value="1">
+                        <button onclick="increment()">+</button>
+                        <script>
+                            function increment() {
+                            document.getElementById('quantity-select').stepUp();
+                            }
+                            function decrement() {
+                            document.getElementById('quantity-select').stepDown();
+                            }
+                        </script>
+                        <br>
+                        <input type="submit" value="Add to cart">
+                        <!-- <a class="btn btn-primary" href="/add_to_cart/{{ display_melon.melon_id }}">Add to cart</a> -->
+                        <!-- <input id=demoInput type=number min=100 max=110>
+                        <button onclick="increment()">+</button>
+                        <button onclick="decrement()">-</button>
+                        <script>
+                        function increment() {
+                            document.getElementById('demoInput').stepUp();
+                        }
+                        function decrement() {
+                            document.getElementById('demoInput').stepDown();
+                        }
+                        </script>                 -->  
+                    </form>
+                 </div>
             </div>
+
+
+
         </div>
     </div>
 
