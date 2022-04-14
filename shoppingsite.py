@@ -6,7 +6,7 @@ put melons in a shopping cart.
 Authors: Joel Burton, Christian Fernandez, Meggie Mahnken, Katie Byers.
 """
 
-from flask import Flask, render_template, redirect, flash
+from flask import Flask, render_template, redirect, flash, session
 import jinja2
 
 import melons
@@ -31,6 +31,9 @@ app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = True
 def index():
     """Return homepage."""
 
+    session.clear()
+    session['cart'] = {}
+
     return render_template("homepage.html")
 
 
@@ -50,7 +53,7 @@ def show_melon(melon_id):
     Show all info about a melon. Also, provide a button to buy that melon.
     """
 
-    melon = melons.get_by_id("meli")
+    melon = melons.get_by_id(melon_id)
     print(melon)
     return render_template("melon_details.html",
                            display_melon=melon)
@@ -59,6 +62,27 @@ def show_melon(melon_id):
 @app.route("/cart")
 def show_shopping_cart():
     """Display content of shopping cart."""
+
+    melons_in_cart = []
+    total_cost = 0
+    temp_total_cost = 0
+    
+    for melon_key, quantity in session['cart'].items():
+        melon = melons.get_by_id(melon_key)
+        temp_total_cost = quantity * melon.price
+        melons_in_cart.append([melon.common_name, quantity, melon.price, temp_total_cost])
+        total_cost += temp_total_cost
+#        total_cost.append(quantity * melon.price)
+ #   for cost in total_cost:
+  #      total_cost += cost
+
+#    return render_template ("cart.html",
+ #                               "common_name",
+  #                              "session['cart'][melon_id]",
+   #                             "price",
+    #                            session['cart'][melon_id] * price)
+
+
 
     # TODO: Display the contents of the shopping cart.
 
@@ -78,7 +102,7 @@ def show_shopping_cart():
     # Make sure your function can also handle the case wherein no cart has
     # been added to the session
 
-    return render_template("cart.html")
+    return render_template("cart.html", melons_in_cart=melons_in_cart, total_cost=total_cost)
 
 
 @app.route("/add_to_cart/<melon_id>")
@@ -88,6 +112,19 @@ def add_to_cart(melon_id):
     When a melon is added to the cart, redirect browser to the shopping cart
     page and display a confirmation message: 'Melon successfully added to
     cart'."""
+
+    if 'cart' in session:
+        if melon_id in session['cart']:
+            session['cart'][melon_id] += 1
+        else:
+            session['cart'][melon_id] = 1
+    else:
+        session['cart'] = {}
+        session['cart'][melon_id] = 1
+
+    session.modified = True
+
+    flash("this melon was added to the cart")
 
     # TODO: Finish shopping cart functionality
 
@@ -100,7 +137,7 @@ def add_to_cart(melon_id):
     # - flash a success message
     # - redirect the user to the cart page
 
-    return "Oops! This needs to be implemented!"
+    return redirect("/cart")
 
 
 @app.route("/login", methods=["GET"])
